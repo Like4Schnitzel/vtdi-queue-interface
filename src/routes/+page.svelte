@@ -1,9 +1,9 @@
 <script lang="ts">
-
+    import Queue from "$lib/Queue.svelte";
 </script>
 
 <body>
-
+    <Queue />
 </body>
 
 <style>
