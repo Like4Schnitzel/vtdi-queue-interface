@@ -1,8 +1,10 @@
 <script lang="ts">
+    import Input from "$lib/Input.svelte";
     import Queue from "$lib/Queue.svelte";
 </script>
 
 <body>
+    <Input />
     <Queue />
 </body>
 

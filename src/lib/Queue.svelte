@@ -4,6 +4,6 @@
 
 <ul>
     {#each $queue as url}
-        <li>url</li>
+        <li>{url}</li>
     {/each}
 </ul>
