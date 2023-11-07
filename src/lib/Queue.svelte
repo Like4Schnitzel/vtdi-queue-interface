@@ -3,7 +3,7 @@
 </script>
 
 <ul>
-    {#each $queue as url}
-        <li>{url}</li>
+    {#each $queue as elem}
+        <li>{elem.url}</li>
     {/each}
 </ul>
