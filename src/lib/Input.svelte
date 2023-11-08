@@ -21,6 +21,11 @@
             return;
         }
 
+        // at this point we know it's a valid URL
+        debugger;
+        const id: string = inputURL.searchParams.get("v") || inputURL.pathname.substring(1);
+        inputURL = new URL(`https://www.youtube.com/watch?v=${id}`);
+
         if (inputURL) {
             const requestURL = `https://www.youtube.com/oembed?url=${inputURL}&format=json`;
             const request = new Request(requestURL);
@@ -35,7 +40,7 @@
             }
 
             queue.add({
-                url: httpsInputText,
+                url: inputURL.toString(),
                 info: infoJSON
             });
 
