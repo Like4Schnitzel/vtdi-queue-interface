@@ -11,7 +11,7 @@ export type YouTubeResponse = {
     thumbnail_height: number,
     thumbnail_width: number,
     thumbnail_url: number,
-    html: HTMLIFrameElement
+    html: string
 }
 
 export type QueueInfo = {
