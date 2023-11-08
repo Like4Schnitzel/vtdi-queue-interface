@@ -9,8 +9,11 @@ function createQueue() {
         add: ((url: QueueInfo) => update((cq) => {
             cq.push(url);
             return cq;
+        })),
+        set: ((qis: QueueInfo[]) => update(() => {
+            return qis;
         }))
     }
 }
 
-export const queue = createQueue();
+export const localQueue = createQueue();

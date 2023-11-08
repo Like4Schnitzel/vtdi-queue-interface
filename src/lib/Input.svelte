@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { queue } from "./stores";
-    import type { YouTubeResponse } from "./types";
+    import type { QueueInfo, YouTubeResponse } from "./types";
+    import { localQueue } from "./stores";
 
     function lstrip(s: string, characters: string) {
         let start = 0;
@@ -9,6 +9,15 @@
         }
         return s.substring(start);
     }
+
+    const addToQueue = async (qi: QueueInfo) => {
+            localQueue.add(qi);
+
+            await fetch('/queue', {
+                method: 'POST',
+                body: JSON.stringify(qi)
+            });
+    };
 
     const processInput = async () => {
         // make sure there's https:// as a prefix
@@ -22,7 +31,6 @@
         }
 
         // at this point we know it's a valid URL
-        debugger;
         const id: string = inputURL.searchParams.get("v") || inputURL.pathname.substring(1);
         inputURL = new URL(`https://www.youtube.com/watch?v=${id}`);
 
@@ -39,7 +47,7 @@
                 return;
             }
 
-            queue.add({
+            await addToQueue({
                 url: inputURL.toString(),
                 info: infoJSON
             });

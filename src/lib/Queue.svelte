@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { queue } from "./stores";
+    import { localQueue } from "./stores";
 </script>
 
 <ul>
-    {#each $queue as elem}
+    {#each $localQueue as elem}
         <li>{elem.url}</li>
     {/each}
 </ul>

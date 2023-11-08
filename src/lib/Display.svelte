@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { queue } from "./stores";
+    import { localQueue } from "./stores";
 </script>
 
-{#if $queue.length > 0}
-    {@html $queue[0].info.html}
+{#if $localQueue.length > 0}
+    {@html $localQueue[0].info.html}
 {/if}
