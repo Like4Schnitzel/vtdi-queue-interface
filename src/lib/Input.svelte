@@ -53,19 +53,25 @@
             });
 
             validURL = true;
+            inputElement.value = '';
         }
         else {
             validURL = false;
         }
-    }
+    };
 
     let inputText: string;
+    let inputElement: HTMLInputElement;
     let validURL = true;
 </script>
 
 <div class="biggerContainer">
     <div class="container">
-        <input bind:value={inputText}/>
+        <input bind:value={inputText} bind:this={inputElement} on:keydown={async (e) => {
+            if (e.key === 'Enter') {
+                processInput();
+            }
+        }}/>
         <button on:focus={processInput}>Submit</button>
     </div>
     {#if !validURL}
