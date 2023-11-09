@@ -17,18 +17,13 @@
     });
 
     const deleteFromQueue = async (i: number) => {
-        const response = await fetch ('/queue', {
+        await fetch ('/queue', {
             method: 'DELETE',
             body: JSON.stringify({
                 password: pw,
                 index: i
             })
         });
-        const status = (await response.json()).status;
-
-        if (status === 200) {
-            localQueue.remove(i);
-        }
     };
 </script>
 
@@ -65,12 +60,15 @@
 
     .line {
         height: 2rem;
+        display: flex;
+        align-items: center;
     }
 
     .line li {
-        font-size: 1rem;
+        font-size: 1.3rem;
         width: fit-content;
         display: inline-block;
+        margin-right: 1%;
     }
 
     .line img {
