@@ -39,7 +39,7 @@
             // else the status is 201
 
             validURL = true;
-            inputElement.value = '';
+            inputText = '';
         }
         else {
             validURL = false;
@@ -47,18 +47,17 @@
     };
 
     let inputText: string;
-    let inputElement: HTMLInputElement;
     let validURL = true;
 </script>
 
 <div class="biggerContainer">
     <div class="container">
-        <input bind:value={inputText} bind:this={inputElement} on:keydown={async (e) => {
+        <input bind:value={inputText} on:keydown={async (e) => {
             if (e.key === 'Enter') {
                 processInput();
             }
         }}/>
-        <button on:focus={processInput}>Submit</button>
+        <button on:click={processInput}>Submit</button>
     </div>
     {#if !validURL}
         <p class="error">ERROR: Invalid URL</p>
