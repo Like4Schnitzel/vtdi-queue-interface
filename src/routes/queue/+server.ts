@@ -16,8 +16,8 @@ export const POST: RequestHandler = async ({ request }) => {
 export const DELETE: RequestHandler = async ({ request }) => {
     const body = await request.json();
     const pw: string = body.password;
-    // sha256 hash of correct password is 90d9e6c2489d8a428f403f2d01f406146946bf3699039a3763a2601226c47429
-    if (sha256(pw) === "90d9e6c2489d8a428f403f2d01f406146946bf3699039a3763a2601226c47429") {
+    // sha256 hash of correct password is 8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca
+    if (sha256(pw) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
         const indexToRemove = body.index;
         queue.splice(indexToRemove, 1);
         return json({ status: 200 });

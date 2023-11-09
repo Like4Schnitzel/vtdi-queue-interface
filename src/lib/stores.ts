@@ -12,6 +12,10 @@ function createQueue() {
         })),
         set: ((qis: QueueInfo[]) => update(() => {
             return qis;
+        })),
+        remove: ((index: number) => update((cq) => {
+            cq.splice(index, 1);
+            return cq;
         }))
     }
 }
