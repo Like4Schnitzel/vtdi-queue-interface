@@ -3,9 +3,17 @@
     import { localQueue } from "$lib/stores";
     
     let pw: string = "";
+    let source: EventSource;
 
     onMount(async () => {
         localQueue.set(await (await fetch('/queue')).json());
+
+        source = new EventSource('/api/sse', {
+            withCredentials: false
+        });
+        source.addEventListener('queueModified', async (e) => {
+            localQueue.set(await (await fetch('/queue')).json());
+        });
     });
 
     const deleteFromQueue = async (i: number) => {
