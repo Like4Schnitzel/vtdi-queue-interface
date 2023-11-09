@@ -3,10 +3,18 @@
     import Queue from "$lib/Queue.svelte";
     import Display from "$lib/Display.svelte";
     import { localQueue } from "$lib/stores";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
+    let source: EventSource;
     onMount(async () => {
         localQueue.set(await (await fetch('/queue')).json())
+
+        source = new EventSource('/api/sse', {
+            withCredentials: false
+        });
+        source.addEventListener('queueModified', async (e) => {
+            localQueue.set(await (await fetch('/queue')).json());
+        });
     });
 </script>
 

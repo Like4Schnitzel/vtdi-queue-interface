@@ -2,6 +2,7 @@ import { queue } from "$lib/queue";
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import { sha256 } from 'js-sha256';
+import { somethingEmitter } from "$lib/server/createSSE";
 
 export const GET: RequestHandler = async () => {
     return json(queue);
@@ -20,6 +21,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
     if (sha256(pw) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
         const indexToRemove = body.index;
         queue.splice(indexToRemove, 1);
+        somethingEmitter.emit('queueModified');
         return json({ status: 200 });
     }
 

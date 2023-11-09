@@ -11,12 +11,12 @@
     }
 
     const addToQueue = async (qi: QueueInfo) => {
-            localQueue.add(qi);
+        localQueue.add(qi);
 
-            await fetch('/queue', {
-                method: 'POST',
-                body: JSON.stringify(qi)
-            });
+        await fetch('/queue', {
+            method: 'POST',
+            body: JSON.stringify(qi)
+        });
     };
 
     const processInput = async () => {

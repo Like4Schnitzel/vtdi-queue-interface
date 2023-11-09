@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { localQueue } from "$lib/stores";
-    import { sha256 } from "js-sha256";
     
     let pw: string = "";
 
