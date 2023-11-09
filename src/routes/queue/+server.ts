@@ -25,7 +25,8 @@ export const POST: RequestHandler = async ({ request }) => {
         url: baseURL,
         info: infoJSON
     });
-    return json({ status: 201, body: infoJSON });
+    somethingEmitter.emit('queueModified');
+    return json({ status: 201 });
 };
 
 export const DELETE: RequestHandler = async ({ request }) => {
