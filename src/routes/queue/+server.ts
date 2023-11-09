@@ -3,6 +3,7 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import { sha256 } from 'js-sha256';
 import { somethingEmitter } from "$lib/server/createSSE";
+import type { YouTubeResponse } from "$lib/types";
 
 export const GET: RequestHandler = async () => {
     return json(queue);
@@ -10,8 +11,21 @@ export const GET: RequestHandler = async () => {
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await request.json();
-    queue.push(body);
-    return json({ status: 201 });
+    const baseURL = body.baseURL;
+    const url = body.url;
+    const req = new Request(url);
+    const res = await fetch(req);
+    let infoJSON: YouTubeResponse;
+    try {
+        infoJSON = await res.json();
+    } catch {
+        return json({ status: 502 });
+    }
+    queue.push({
+        url: baseURL,
+        info: infoJSON
+    });
+    return json({ status: 201, body: infoJSON });
 };
 
 export const DELETE: RequestHandler = async ({ request }) => {

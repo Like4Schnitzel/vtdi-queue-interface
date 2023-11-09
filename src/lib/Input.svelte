@@ -1,7 +1,4 @@
 <script lang="ts">
-    import type { QueueInfo, YouTubeResponse } from "./types";
-    import { localQueue } from "./stores";
-
     function lstrip(s: string, characters: string) {
         let start = 0;
         while (characters.indexOf(s[start]) >= 0) {
@@ -9,15 +6,6 @@
         }
         return s.substring(start);
     }
-
-    const addToQueue = async (qi: QueueInfo) => {
-        localQueue.add(qi);
-
-        await fetch('/queue', {
-            method: 'POST',
-            body: JSON.stringify(qi)
-        });
-    };
 
     const processInput = async () => {
         // make sure there's https:// as a prefix
@@ -35,22 +23,20 @@
         inputURL = new URL(`https://www.youtube.com/watch?v=${id}`);
 
         if (inputURL) {
-            const requestURL = `https://www.youtube.com/oembed?url=${inputURL}&format=json`;
-            const request = new Request(requestURL);
-            const res = await fetch(request);
-
-            let infoJSON: YouTubeResponse
-            try {
-                infoJSON = await res.json();
-            } catch {
+            const requestURL = new URL(`https://www.youtube.com/oembed?url=${inputURL}&format=json`);
+            const response = await fetch('/queue', {
+                method: 'POST',
+                body: JSON.stringify({
+                    url: requestURL,
+                    baseURL: inputURL
+                })
+            });
+            const result = await response.json();
+            if (result.status === 502) {
                 validURL = false;
                 return;
             }
-
-            await addToQueue({
-                url: inputURL.toString(),
-                info: infoJSON
-            });
+            // else the status is 201
 
             validURL = true;
             inputElement.value = '';
