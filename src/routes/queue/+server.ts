@@ -4,12 +4,16 @@ import { json } from "@sveltejs/kit";
 import { sha256 } from 'js-sha256';
 import { somethingEmitter } from "$lib/server/createSSE";
 import type { YouTubeResponse } from "$lib/types";
+import { cooldown } from "$lib/consts";
 
 export const GET: RequestHandler = async () => {
+    queue.cooldown = (queue.cooldownStartTime - Date.now()) / 1000;
+    if (queue.cooldown < 0) queue.cooldown = 0;
     return json(queue);
 };
 
 export const POST: RequestHandler = async ({ request }) => {
+    queue.cooldown = (queue.cooldownStartTime - Date.now()) / 1000;
     if (queue.cooldown > 0)
         return json({ status: 400, message: "Wait for the cooldown to end" });
     if (queue.videos.length >= 5) {
@@ -31,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
         url: baseURL,
         info: infoJSON
     });
-    queue.cooldown = 30;
+    queue.cooldownStartTime = Date.now() + cooldown;
     somethingEmitter.emit('queueModified');
     return json({ status: 201 });
 };
