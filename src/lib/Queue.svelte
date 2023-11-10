@@ -4,6 +4,6 @@
 
 <ul>
     {#each $localQueue as elem}
-        <li>{elem.url}</li>
+        <li>{elem.info.title}</li>
     {/each}
 </ul>

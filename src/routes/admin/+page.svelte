@@ -39,7 +39,7 @@
     <ol>
         {#each $localQueue as queueElem, i}
             <div class="line">
-                <li>{queueElem.url}</li>
+                <li>{queueElem.info.title}</li>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img src="x.svg" alt="red x" title="delete from queue" on:click={() => {deleteFromQueue(i)}}/>
