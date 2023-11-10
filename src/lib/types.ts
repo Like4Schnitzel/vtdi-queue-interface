@@ -21,6 +21,5 @@ export type QueueInfo = {
 
 export type Queue = {
     cooldownStartTime: number,
-    cooldown: number,
     videos: QueueInfo[]
 }

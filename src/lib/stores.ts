@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 import type { Queue, QueueInfo } from "./types";
 
 function createQueue() {
-    const { subscribe, set, update } = writable<Queue>({cooldownStartTime: Date.now(), cooldown: 0, videos: []});
+    const { subscribe, set, update } = writable<Queue>({cooldownStartTime: Date.now(), videos: []});
 
     return {
         subscribe,
@@ -20,4 +20,19 @@ function createQueue() {
     }
 }
 
+function createCooldown() {
+    const { subscribe, set, update } = writable<number>(0);
+
+    return {
+        subscribe,
+        update: ((startTime: number) => update(() => {
+            const temp = (startTime - Date.now()) / 1000;
+            if (temp < 0) return 0;
+            return temp;
+        }))
+    }
+}
+
 export const localQueue = createQueue();
+
+export const cooldown = createCooldown();

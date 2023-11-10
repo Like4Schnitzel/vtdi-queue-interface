@@ -2,7 +2,7 @@
     import Input from "$lib/Input.svelte";
     import Queue from "$lib/Queue.svelte";
     import Display from "$lib/Display.svelte";
-    import { localQueue } from "$lib/stores";
+    import { localQueue, cooldown } from "$lib/stores";
     import { onDestroy, onMount } from "svelte";
 
     let source: EventSource;
@@ -15,6 +15,10 @@
         source.addEventListener('queueModified', async (e) => {
             localQueue.set(await (await fetch('/queue')).json());
         });
+
+        setInterval(() => {
+            cooldown.update($localQueue.cooldownStartTime);
+        }, 1000)
     });
 </script>
 

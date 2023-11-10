@@ -1,1 +1,1 @@
-export const cooldown = 5000;
+export const fixedCooldown = 5000;

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { localQueue } from "./stores";
+    import { cooldown } from "./stores";
 
     function lstrip(s: string, characters: string) {
         let start = 0;
@@ -65,7 +65,7 @@
         }}/>
         <button on:click={processInput}>Submit</button>
         <p>
-            Cooldown: {$localQueue.cooldown}
+            Cooldown: {Math.round($cooldown)}
         </p>
     </div>
     {#if !validURL}
