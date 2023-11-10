@@ -31,6 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
         url: baseURL,
         info: infoJSON
     });
+    queue.cooldown = 30;
     somethingEmitter.emit('queueModified');
     return json({ status: 201 });
 };
