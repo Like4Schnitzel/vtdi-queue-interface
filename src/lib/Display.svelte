@@ -2,7 +2,6 @@
     import { afterUpdate } from "svelte";
     import { localQueue } from "./stores";
     import type { QueueInfo } from "./types";
-    import { browser } from "$app/environment";
 
     let currentlyPlaying: QueueInfo | undefined = undefined;
 
