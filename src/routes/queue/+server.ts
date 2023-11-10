@@ -19,9 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json();
-    const baseURL = body.baseURL;
-    const url = body.url;
-    const req = new Request(url);
+    const req = new Request(body.url);
     const res = await fetch(req);
     let infoJSON: YouTubeResponse;
     try {
@@ -30,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ status: 502, message: "Invalid URL" });
     }
     queue.videos.push({
-        url: baseURL,
+        url: body.baseURL,
         info: infoJSON
     });
     queue.cooldownStartTime = Date.now() + fixedCooldown;
