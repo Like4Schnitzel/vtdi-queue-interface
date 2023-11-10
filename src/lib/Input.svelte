@@ -17,6 +17,7 @@
             inputURL = new URL(httpsInputText);
         } catch {
             validURL = false;
+            errorMessage = "Invalid URL";
             return;
         }
 
@@ -34,22 +35,25 @@
                 })
             });
             const result = await response.json();
-            if (result.status === 502) {
+            if (result.status !== 201) {
                 validURL = false;
+                errorMessage = result.message;
                 return;
             }
-            // else the status is 201
+            // else
 
             validURL = true;
             inputText = '';
         }
         else {
             validURL = false;
+            errorMessage = "Invalid URL";
         }
     };
 
     let inputText: string;
     let validURL = true;
+    let errorMessage: string;
 </script>
 
 <div class="biggerContainer">
@@ -65,7 +69,7 @@
         </p>
     </div>
     {#if !validURL}
-        <p class="error">ERROR: Invalid URL</p>
+        <p class="error">ERROR: {errorMessage}</p>
     {/if}
 </div>
 

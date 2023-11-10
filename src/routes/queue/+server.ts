@@ -10,6 +10,12 @@ export const GET: RequestHandler = async () => {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
+    if (queue.cooldown > 0)
+        return json({ status: 400, message: "Wait for the cooldown to end" });
+    if (queue.videos.length >= 5) {
+        return json({ status: 400, message: "Queue already full" });
+    }
+
     const body = await request.json();
     const baseURL = body.baseURL;
     const url = body.url;
@@ -19,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
     try {
         infoJSON = await res.json();
     } catch {
-        return json({ status: 502 });
+        return json({ status: 502, message: "Invalid URL" });
     }
     queue.videos.push({
         url: baseURL,
