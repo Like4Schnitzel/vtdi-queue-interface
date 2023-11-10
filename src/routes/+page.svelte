@@ -3,7 +3,7 @@
     import Queue from "$lib/Queue.svelte";
     import Display from "$lib/Display.svelte";
     import { localQueue, cooldown } from "$lib/stores";
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
 
     let source: EventSource;
     onMount(async () => {
@@ -13,7 +13,7 @@
             withCredentials: false
         });
         source.addEventListener('queueModified', async (e) => {
-            localQueue.set(await (await fetch('/queue')).json());
+            localQueue.set(JSON.parse(e.data));
         });
 
         setInterval(() => {

@@ -12,7 +12,7 @@
             withCredentials: false
         });
         source.addEventListener('queueModified', async (e) => {
-            localQueue.set(await (await fetch('/queue')).json());
+            localQueue.set(JSON.parse(e.data));
         });
     });
 

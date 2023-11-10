@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
         info: infoJSON
     });
     queue.cooldownStartTime = Date.now() + fixedCooldown;
-    somethingEmitter.emit('queueModified');
+    somethingEmitter.emit('queueModified', queue);
     return json({ status: 201 });
 };
 
@@ -47,7 +47,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
     if (sha256(pw) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
         const indexToRemove = body.index;
         queue.videos.splice(indexToRemove, 1);
-        somethingEmitter.emit('queueModified');
+        somethingEmitter.emit('queueModified', queue);
         return json({ status: 200 });
     }
 
