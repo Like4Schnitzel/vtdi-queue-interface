@@ -1,3 +1,6 @@
-import type { QueueInfo } from "./types";
+import type { Queue } from "./types";
 
-export const queue: QueueInfo[] = [];
+export const queue: Queue = {
+    cooldown: 0,
+    videos: []
+};

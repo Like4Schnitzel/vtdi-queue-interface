@@ -37,7 +37,7 @@
         <input bind:value={pw} type="text"/>
     </div>
     <ol>
-        {#each $localQueue as queueElem, i}
+        {#each $localQueue.videos as queueElem, i}
             <div class="line">
                 <li>{queueElem.info.title}</li>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->

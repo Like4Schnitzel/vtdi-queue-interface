@@ -1,20 +1,20 @@
 import { writable } from "svelte/store";
-import type { QueueInfo } from "./types";
+import type { Queue, QueueInfo } from "./types";
 
 function createQueue() {
-    const { subscribe, set, update } = writable<QueueInfo[]>([]);
+    const { subscribe, set, update } = writable<Queue>({cooldown: 0, videos: []});
 
     return {
         subscribe,
         add: ((url: QueueInfo) => update((cq) => {
-            cq.push(url);
+            cq.videos.push(url);
             return cq;
         })),
-        set: ((qis: QueueInfo[]) => update(() => {
+        set: ((qis: Queue) => update(() => {
             return qis;
         })),
         remove: ((index: number) => update((cq) => {
-            cq.splice(index, 1);
+            cq.videos.splice(index, 1);
             return cq;
         }))
     }

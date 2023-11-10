@@ -18,3 +18,8 @@ export type QueueInfo = {
     url: string,
     info: YouTubeResponse
 }
+
+export type Queue = {
+    cooldown: number,
+    videos: QueueInfo[]
+}

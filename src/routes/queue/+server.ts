@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
     } catch {
         return json({ status: 502 });
     }
-    queue.push({
+    queue.videos.push({
         url: baseURL,
         info: infoJSON
     });
@@ -35,7 +35,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
     // sha256 hash of correct password is 8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca
     if (sha256(pw) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
         const indexToRemove = body.index;
-        queue.splice(indexToRemove, 1);
+        queue.videos.splice(indexToRemove, 1);
         somethingEmitter.emit('queueModified');
         return json({ status: 200 });
     }

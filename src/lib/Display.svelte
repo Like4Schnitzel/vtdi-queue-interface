@@ -11,6 +11,6 @@
     });
 </script>
 
-{#if $localQueue.length > 0}
-    {@html $localQueue[0].info.html}
+{#if $localQueue.videos.length > 0}
+    {@html $localQueue.videos[0].info.html}
 {/if}

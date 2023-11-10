@@ -3,7 +3,7 @@
 </script>
 
 <ul>
-    {#each $localQueue as elem}
+    {#each $localQueue.videos as elem}
         <li>{elem.info.title}</li>
     {/each}
 </ul>

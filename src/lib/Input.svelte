@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { localQueue } from "./stores";
+
     function lstrip(s: string, characters: string) {
         let start = 0;
         while (characters.indexOf(s[start]) >= 0) {
@@ -58,6 +60,9 @@
             }
         }}/>
         <button on:click={processInput}>Submit</button>
+        <p>
+            Cooldown: {$localQueue.cooldown}
+        </p>
     </div>
     {#if !validURL}
         <p class="error">ERROR: Invalid URL</p>
@@ -72,6 +77,7 @@
     .container {
         display: flex;
         gap: 1rem;
+        align-items: center;
     }
 
     .container input {
@@ -80,6 +86,11 @@
 
     .container button {
         flex-basis: 20%;
+    }
+
+    .container p {
+        white-space: nowrap;
+        margin: 0;
     }
 
     .error {
