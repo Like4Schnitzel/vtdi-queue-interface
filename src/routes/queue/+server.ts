@@ -19,8 +19,12 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json();
-    const req = new Request(body.url);
-    const res = await fetch(req);
+    let res;
+    try {
+        res = await fetch(body.url);
+    } catch {
+        return json({ status: 502, message: "Request blocked" })
+    }
     let infoJSON: YouTubeResponse;
     try {
         infoJSON = await res.json();
