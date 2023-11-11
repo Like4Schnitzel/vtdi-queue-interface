@@ -4,23 +4,37 @@
     import type { QueueInfo } from "./types";
 
     let currentlyPlaying: QueueInfo | undefined = undefined;
+    let playerElem: any;
+    let playerContainer: HTMLDivElement;
+
+    const stringToHTMLElement = (str: string) => {
+        const div = document.createElement('div');
+        div.innerHTML = str.trim();
+        return div.firstChild;
+    };
 
     afterUpdate(() => {
         if ($localQueue.videos[0] !== undefined && currentlyPlaying?.uniqueID !== $localQueue.videos[0].uniqueID) {
             currentlyPlaying = $localQueue.videos[0];
 
-            const searchFor = "src=\"";
-            const srcStartPos = currentlyPlaying.info.html.indexOf(searchFor) + searchFor.length;
-            const srcEndPos = currentlyPlaying.info.html.indexOf("\"", srcStartPos);
-            currentlyPlaying.info.html = currentlyPlaying.info.html.substring(
-                0, srcEndPos
-            ) + "&autoplay=1" + "\"" + currentlyPlaying.info.html.substring(
-                srcEndPos + 1
-            );
+            playerElem = stringToHTMLElement(currentlyPlaying.info.html);
+            playerElem.src += '&autoplay=1';
+            if (playerContainer.firstChild) {
+                playerContainer.removeChild(playerContainer.firstChild);
+            }
+            playerContainer.appendChild(playerElem);
+        } else if ($localQueue.videos[0] === undefined && playerContainer.firstChild) {
+            playerContainer.removeChild(playerContainer.firstChild);
         }
     });
 </script>
 
-{#if currentlyPlaying !== undefined}
-    {@html currentlyPlaying.info.html}
-{/if}
+<div class="playerDiv" bind:this={playerContainer}>
+    <!--iframe goes here-->
+</div>
+
+<style>
+    .playerDiv {
+        pointer-events: none;
+    }
+</style>
