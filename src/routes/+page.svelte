@@ -15,6 +15,9 @@
         source.addEventListener('queueModified', async (e) => {
             localQueue.set(JSON.parse(e.data));
         });
+        source.addEventListener('queueItemRemoved', async (e) => {
+            localQueue.remove(JSON.parse(e.data));
+        });
 
         setInterval(() => {
             cooldown.update($localQueue.cooldownStartTime);

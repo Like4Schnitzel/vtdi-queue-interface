@@ -52,7 +52,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
         const indexToRemove = body.index;
         availableIDs.push(queue.videos[indexToRemove].uniqueID);
         queue.videos.splice(indexToRemove, 1);
-        somethingEmitter.emit('queueModified', queue);
+        somethingEmitter.emit('queueItemRemoved', indexToRemove);
         return json({ status: 200 });
     }
 

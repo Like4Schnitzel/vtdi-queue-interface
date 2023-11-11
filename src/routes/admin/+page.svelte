@@ -14,6 +14,9 @@
         source.addEventListener('queueModified', async (e) => {
             localQueue.set(JSON.parse(e.data));
         });
+        source.addEventListener('queueItemRemoved', async (e) => {
+            localQueue.remove(JSON.parse(e.data));
+        });
     });
 
     const deleteFromQueue = async (i: number) => {
