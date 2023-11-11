@@ -18,6 +18,9 @@
         source.addEventListener('queueItemRemoved', async (e) => {
             localQueue.remove(JSON.parse(e.data));
         });
+        source.addEventListener('queueItemAdded', async (e) => {
+            localQueue.add(JSON.parse(e.data));
+        });
 
         setInterval(() => {
             cooldown.update($localQueue.cooldownStartTime);

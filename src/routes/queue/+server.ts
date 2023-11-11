@@ -3,7 +3,7 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import { sha256 } from 'js-sha256';
 import { somethingEmitter } from "$lib/server/createSSE";
-import type { YouTubeResponse } from "$lib/types";
+import type { QueueInfo, YouTubeResponse } from "$lib/types";
 import { fixedCooldown } from "$lib/consts";
 
 export const GET: RequestHandler = async () => {
@@ -34,13 +34,14 @@ export const POST: RequestHandler = async ({ request }) => {
     const idIndex = Math.floor(Math.random() * availableIDs.length);
     const id = availableIDs[idIndex];
     availableIDs.splice(idIndex, 1);
-    queue.videos.push({
+    const newQueueItem: QueueInfo = {
         url: body.baseURL,
         info: infoJSON,
         uniqueID: id
-    });
+    };
+    queue.videos.push(newQueueItem);
     queue.cooldownStartTime = Date.now() + fixedCooldown;
-    somethingEmitter.emit('queueModified', queue);
+    somethingEmitter.emit('queueItemAdded', newQueueItem);
     return json({ status: 201 });
 };
 
