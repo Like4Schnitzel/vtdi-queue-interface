@@ -11,62 +11,78 @@ export const GET: RequestHandler = async () => {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-    const cooldown = (queue.cooldownStartTime - Date.now()) / 1000;
-    if (cooldown > 0)
-        return json({ status: 400, message: "Wait for the cooldown to end" });
-    if (queue.videos.length >= maxQueueSize) {
-        return json({ status: 400, message: "Queue already full" });
-    }
-
     const body = await request.json();
-    if (!body.width) {
-        return json({ status: 400, message: "Width not specified" });
-    }
-    if (body.width > maxWidth) {
-        return json({ status: 400, message: "Width too big" });
-    }
-    if (!body.height) {
-        return json({ status: 400, message: "Height not specified" });
-    }
-    if (body.height > maxHeight) {
-        return json({ status: 400, message: "Height too big" });
-    }
-
-    let res;
-    try {
-        res = await fetch(body.url);
-    } catch {
-        return json({ status: 502, message: "Request blocked" })
-    }
-    let infoJSON: YouTubeResponse;
-    try {
-        infoJSON = await res.json();
-    } catch {
-        return json({ status: 502, message: "Invalid URL" });
-    }
-
-    // check that the video isn't already in the queue
-    for (const elem of queue.videos) {
-        if (elem.info.html === infoJSON.html) {
-            return json({ status: 400, message: "Video already in queue" });
+    if (body.method === "queueItem") {
+        const cooldown = (queue.cooldownStartTime - Date.now()) / 1000;
+        if (cooldown > 0)
+            return json({ status: 400, message: "Wait for the cooldown to end" });
+        if (queue.videos.length >= maxQueueSize) {
+            return json({ status: 400, message: "Queue already full" });
         }
+        if (!body.width) {
+            return json({ status: 400, message: "Width not specified" });
+        }
+        if (body.width > maxWidth) {
+            return json({ status: 400, message: "Width too big" });
+        }
+        if (!body.height) {
+            return json({ status: 400, message: "Height not specified" });
+        }
+        if (body.height > maxHeight) {
+            return json({ status: 400, message: "Height too big" });
+        }
+
+        let res;
+        try {
+            res = await fetch(body.url);
+        } catch {
+            return json({ status: 502, message: "Request blocked" })
+        }
+        let infoJSON: YouTubeResponse;
+        try {
+            infoJSON = await res.json();
+        } catch {
+            return json({ status: 502, message: "Invalid URL" });
+        }
+
+        // check that the video isn't already in the queue
+        for (const elem of queue.videos) {
+            if (elem.info.html === infoJSON.html) {
+                return json({ status: 400, message: "Video already in queue" });
+            }
+        }
+
+        const idIndex = Math.floor(Math.random() * availableIDs.length);
+        const id = availableIDs[idIndex];
+        availableIDs.splice(idIndex, 1);
+        const newQueueItem: QueueInfo = {
+            url: body.baseURL,
+            info: infoJSON,
+            uniqueID: id,
+            timeStartedPlaying: Date.now(),
+            width: body.width,
+            height: body.height,
+            transcodeProgress: 0
+        };
+        queue.videos.push(newQueueItem);
+        queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;
+        somethingEmitter.emit('queueItemAdded', newQueueItem);
+        return json({ status: 201 });
+    } else if (body.method === "updateProgress") {
+        if (sha256(body.password) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
+            console.log(body);
+            queue.videos[body.queueIndex].transcodeProgress = body.progress;
+            somethingEmitter.emit('progressUpdated', {
+                index: body.queueIndex,
+                newProgress: body.progress
+            });
+            return json({ status: 200 });
+        }
+
+        return json({ status: 403 });
     }
 
-    const idIndex = Math.floor(Math.random() * availableIDs.length);
-    const id = availableIDs[idIndex];
-    availableIDs.splice(idIndex, 1);
-    const newQueueItem: QueueInfo = {
-        url: body.baseURL,
-        info: infoJSON,
-        uniqueID: id,
-        timeStartedPlaying: Date.now(),
-        width: body.width,
-        height: body.width
-    };
-    queue.videos.push(newQueueItem);
-    queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;
-    somethingEmitter.emit('queueItemAdded', newQueueItem);
-    return json({ status: 201 });
+    return json({ status: 500, message: "Unknown method" });
 };
 
 export const DELETE: RequestHandler = async ({ request }) => {

@@ -20,7 +20,8 @@ export type QueueInfo = {
     uniqueID: number,
     timeStartedPlaying: number,
     width: number,
-    height: number
+    height: number,
+    transcodeProgress: number
 }
 
 export type Queue = {

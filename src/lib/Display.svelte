@@ -14,7 +14,7 @@
     };
 
     afterUpdate(() => {
-        if ($localQueue.videos[0] !== undefined && currentlyPlaying?.uniqueID !== $localQueue.videos[0].uniqueID) {
+        if ($localQueue.videos[0] !== undefined && $localQueue.videos[0].transcodeProgress === 100 && currentlyPlaying?.uniqueID !== $localQueue.videos[0].uniqueID) {
             currentlyPlaying = $localQueue.videos[0];
 
             playerElem = stringToHTMLElement(currentlyPlaying.info.html);

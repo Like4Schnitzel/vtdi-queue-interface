@@ -31,6 +31,7 @@
             const response = await fetch('/queue', {
                 method: 'POST',
                 body: JSON.stringify({
+                    method: 'queueItem',
                     url: requestURL,
                     baseURL: inputURL,
                     width: inputWidth,

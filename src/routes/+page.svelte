@@ -28,6 +28,10 @@
             $localQueue.cooldownStartTime = Date.now() + fixedCooldown;
             cooldown.update($localQueue.cooldownStartTime);
         });
+        source.addEventListener('progressUpdated', async (e) => {
+            const info = JSON.parse(e.data);
+            $localQueue.videos[info.index].transcodeProgress = info.newProgress;
+        });
 
         setInterval(() => {
             cooldown.update($localQueue.cooldownStartTime);
