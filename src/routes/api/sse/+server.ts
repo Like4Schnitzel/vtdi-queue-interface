@@ -7,6 +7,7 @@ export const GET: RequestHandler = async () => {
     subscribeToEvent(somethingEmitter , 'queueItemRemoved');
     subscribeToEvent(somethingEmitter, 'queueItemAdded');
     subscribeToEvent(somethingEmitter, 'progressUpdated');
+    subscribeToEvent(somethingEmitter, 'playVideo');
     return new Response(readable, {
       headers: {
         'cache-control': 'no-cache',

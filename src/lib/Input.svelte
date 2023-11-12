@@ -48,6 +48,8 @@
 
             validURL = true;
             inputText = '';
+            inputWidth = null;
+            inputHeight = null;
         }
         else {
             validURL = false;
@@ -56,8 +58,8 @@
     };
 
     let inputText: string;
-    let inputWidth: number;
-    let inputHeight: number;
+    let inputWidth: number | null;
+    let inputHeight: number | null;
     let validURL = true;
     let errorMessage: string;
 </script>
@@ -70,9 +72,19 @@
             }
         }}/>
         <div class="dimensionsInputs">
-            <input bind:value={inputWidth} type="number" max={maxWidth} min=0 />
+            <input bind:value={inputWidth} type="number" max={maxWidth} min=0
+            on:keydown={async (e) => {
+                if (e.key === 'Enter') {
+                    processInput();
+                }
+            }}/>
             <p>x</p>
-            <input bind:value={inputHeight} type="number" max={maxHeight} min=0 />
+            <input bind:value={inputHeight} type="number" max={maxHeight} min=0
+            on:keydown={async (e) => {
+                if (e.key === 'Enter') {
+                    processInput();
+                }
+            }}/>
         </div>
         <button on:click={processInput}>Submit</button>
         <p>
