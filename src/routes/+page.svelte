@@ -4,6 +4,7 @@
     import Display from "$lib/Display.svelte";
     import { localQueue, cooldown } from "$lib/stores";
     import { onMount } from "svelte";
+    import { fixedCooldown } from "$lib/consts";
 
     let source: EventSource;
     onMount(async () => {
@@ -24,6 +25,8 @@
         });
         source.addEventListener('queueItemAdded', async (e) => {
             localQueue.add(JSON.parse(e.data));
+            $localQueue.cooldownStartTime = Date.now() + fixedCooldown;
+            cooldown.update($localQueue.cooldownStartTime);
         });
 
         setInterval(() => {

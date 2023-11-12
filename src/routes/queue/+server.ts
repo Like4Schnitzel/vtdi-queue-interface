@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request }) => {
         timeStartedPlaying: Date.now()
     };
     queue.videos.push(newQueueItem);
-    queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;
+    queue.cooldownStartTime = Date.now() + fixedCooldown;
     somethingEmitter.emit('queueItemAdded', newQueueItem);
     return json({ status: 201 });
 };
