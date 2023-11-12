@@ -37,10 +37,11 @@ export const POST: RequestHandler = async ({ request }) => {
     const newQueueItem: QueueInfo = {
         url: body.baseURL,
         info: infoJSON,
-        uniqueID: id
+        uniqueID: id,
+        timeStartedPlaying: Date.now()
     };
     queue.videos.push(newQueueItem);
-    queue.cooldownStartTime = Date.now() + fixedCooldown;
+    queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;
     somethingEmitter.emit('queueItemAdded', newQueueItem);
     return json({ status: 201 });
 };
@@ -53,6 +54,10 @@ export const DELETE: RequestHandler = async ({ request }) => {
         const indexToRemove = body.index;
         availableIDs.push(queue.videos[indexToRemove].uniqueID);
         queue.videos.splice(indexToRemove, 1);
+        // gotta set the new first video of the queue to just having started playing
+        if (indexToRemove === 0 && queue.videos[0]) {
+            queue.videos[0].timeStartedPlaying = Date.now();
+        }
         somethingEmitter.emit('queueItemRemoved', indexToRemove);
         return json({ status: 200 });
     }

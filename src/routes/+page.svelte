@@ -16,7 +16,11 @@
             localQueue.set(JSON.parse(e.data));
         });
         source.addEventListener('queueItemRemoved', async (e) => {
-            localQueue.remove(JSON.parse(e.data));
+            const index = JSON.parse(e.data);
+            if (index === 0 && $localQueue.videos[1]) {
+                $localQueue.videos[1].timeStartedPlaying = Date.now();
+            }
+            localQueue.remove(index);
         });
         source.addEventListener('queueItemAdded', async (e) => {
             localQueue.add(JSON.parse(e.data));

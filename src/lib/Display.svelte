@@ -2,7 +2,6 @@
     import { afterUpdate } from "svelte";
     import { localQueue } from "./stores";
     import type { QueueInfo } from "./types";
-    import { fixedCooldown } from "./consts";
 
     let currentlyPlaying: QueueInfo | undefined = undefined;
     let playerElem: any;
@@ -19,7 +18,7 @@
             currentlyPlaying = $localQueue.videos[0];
 
             playerElem = stringToHTMLElement(currentlyPlaying.info.html);
-            const timeElapsedSinceAdded = (Date.now() - $localQueue.cooldownStartTime + fixedCooldown) / 1000;
+            const timeElapsedSinceAdded = (Date.now() - $localQueue.videos[0].timeStartedPlaying) / 1000;
             playerElem.src += `&start=${Math.round(timeElapsedSinceAdded)}&autoplay=1`;
             if (playerContainer.firstChild) {
                 playerContainer.removeChild(playerContainer.firstChild);

@@ -17,7 +17,8 @@ export type YouTubeResponse = {
 export type QueueInfo = {
     url: string,
     info: YouTubeResponse,
-    uniqueID: number
+    uniqueID: number,
+    timeStartedPlaying: number
 }
 
 export type Queue = {
