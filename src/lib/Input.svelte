@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { maxHeight, maxWidth } from "./consts";
     import { cooldown } from "./stores";
 
     function lstrip(s: string, characters: string) {
@@ -31,7 +32,9 @@
                 method: 'POST',
                 body: JSON.stringify({
                     url: requestURL,
-                    baseURL: inputURL
+                    baseURL: inputURL,
+                    width: inputWidth,
+                    height: inputHeight
                 })
             });
             const result = await response.json();
@@ -52,6 +55,8 @@
     };
 
     let inputText: string;
+    let inputWidth: number;
+    let inputHeight: number;
     let validURL = true;
     let errorMessage: string;
 </script>
@@ -63,6 +68,11 @@
                 processInput();
             }
         }}/>
+        <div class="dimensionsInputs">
+            <input bind:value={inputWidth} type="number" max={maxWidth} min=0 />
+            <p>x</p>
+            <input bind:value={inputHeight} type="number" max={maxHeight} min=0 />
+        </div>
         <button on:click={processInput}>Submit</button>
         <p>
             Cooldown: {Math.round($cooldown)}
@@ -75,21 +85,22 @@
 
 <style>
     .biggerContainer {
-        width: 25%;
+        width: fit-content;
     }
-
+    
     .container {
         display: flex;
         gap: 1rem;
         align-items: center;
     }
-
-    .container input {
-        flex-basis: 80%;
+    
+    .dimensionsInputs {
+        display: flex;
+        width: 20%;
     }
 
-    .container button {
-        flex-basis: 20%;
+    .dimensionsInputs input {
+        width: 50%;
     }
 
     .container p {

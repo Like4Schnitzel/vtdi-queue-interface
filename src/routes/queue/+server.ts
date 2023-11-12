@@ -1,4 +1,4 @@
-import { maxQueueSize, queue, availableIDs } from "$lib/consts";
+import { maxQueueSize, queue, availableIDs, maxWidth, maxHeight } from "$lib/consts";
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import { sha256 } from 'js-sha256';
@@ -19,6 +19,19 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json();
+    if (!body.width) {
+        return json({ status: 400, message: "Width not specified" });
+    }
+    if (body.width > maxWidth) {
+        return json({ status: 400, message: "Width too big" });
+    }
+    if (!body.height) {
+        return json({ status: 400, message: "Height not specified" });
+    }
+    if (body.height > maxHeight) {
+        return json({ status: 400, message: "Height too big" });
+    }
+
     let res;
     try {
         res = await fetch(body.url);
@@ -46,7 +59,9 @@ export const POST: RequestHandler = async ({ request }) => {
         url: body.baseURL,
         info: infoJSON,
         uniqueID: id,
-        timeStartedPlaying: Date.now()
+        timeStartedPlaying: Date.now(),
+        width: body.width,
+        height: body.width
     };
     queue.videos.push(newQueueItem);
     queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;

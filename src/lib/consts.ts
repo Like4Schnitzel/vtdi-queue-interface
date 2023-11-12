@@ -10,3 +10,7 @@ export const queue: Queue = {
 };
 
 export const availableIDs = [...Array(maxQueueSize).keys()];
+
+export const maxWidth = 100;
+
+export const maxHeight = 50;

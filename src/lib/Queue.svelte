@@ -4,6 +4,6 @@
 
 <ul>
     {#each $localQueue.videos as elem}
-        <li>{elem.info.title}</li>
+        <li>{elem.info.title} ({elem.width}x{elem.height})</li>
     {/each}
 </ul>
