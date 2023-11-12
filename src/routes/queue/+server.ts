@@ -31,6 +31,14 @@ export const POST: RequestHandler = async ({ request }) => {
     } catch {
         return json({ status: 502, message: "Invalid URL" });
     }
+
+    // check that the video isn't already in the queue
+    for (const elem of queue.videos) {
+        if (elem.info.html === infoJSON.html) {
+            return json({ status: 400, message: "Video already in queue" });
+        }
+    }
+
     const idIndex = Math.floor(Math.random() * availableIDs.length);
     const id = availableIDs[idIndex];
     availableIDs.splice(idIndex, 1);
@@ -41,7 +49,7 @@ export const POST: RequestHandler = async ({ request }) => {
         timeStartedPlaying: Date.now()
     };
     queue.videos.push(newQueueItem);
-    queue.cooldownStartTime = Date.now() + fixedCooldown;
+    queue.cooldownStartTime = newQueueItem.timeStartedPlaying + fixedCooldown;
     somethingEmitter.emit('queueItemAdded', newQueueItem);
     return json({ status: 201 });
 };
