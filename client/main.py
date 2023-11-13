@@ -17,11 +17,11 @@ def string_to_valid_filename(s):
 
 def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password: str, queueIndex: int):
     video_id = item["url"][item["url"].rfind('=')+1:]
-    file_location = f'{src_dir}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}.mp4'
+    file_location = f'{src_dir}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}'
     # download video
     ydl_ops = {
         'format': 'mp4',
-        'outtmpl': {'default': file_location}
+        'outtmpl': {'default': f'{file_location}.mp4'}
     }
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([item["url"]])
@@ -30,16 +30,19 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
     transcode_process = Popen([
         f'{src_dir}/build/Transcoder',
         '--path',
-        file_location,
+        f'{file_location}.mp4',
+        '--vtdi-path',
+        f'{file_location}_{item["width"]}_{item["height"]}.vtdi',
         '--width',
         str(item["width"]),
         '--height',
         str(item["height"]),
-        '-y'
+        '-n'
         ], stdout=PIPE)
 
     next_progress_num = ""
     track_next_chars = False
+    progress_sent = False
     for c in iter(lambda: transcode_process.stdout.read(1), b''):
         if c == b'%':
             track_next_chars = False
@@ -50,10 +53,20 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
                 'queueIndex': queueIndex
             })
             next_progress_num = ""
+            progress_sent = True
         if track_next_chars:
             next_progress_num += c.decode()
         if c == b'\r':
             track_next_chars = True
+
+    # in case the file already exists and it returns
+    if not progress_sent:
+        post(f'{server_url}/queue', timeout=5, json={
+            'method': 'updateProgress',
+            'password': server_password,
+            'progress': 100,
+            'queueIndex': queueIndex
+        })
 
 
 def main():
