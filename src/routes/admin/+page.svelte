@@ -40,7 +40,7 @@
 <body>
     <div class="passwordField">
         <p>Password: </p>
-        <input bind:value={pw} type="text"/>
+        <input bind:value={pw} type="password"/>
     </div>
     <ol>
         {#each $localQueue.videos as queueElem, i}
