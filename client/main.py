@@ -1,4 +1,5 @@
 from os import remove
+from os import path
 from subprocess import Popen
 from subprocess import PIPE
 from threading import Thread
@@ -46,16 +47,26 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
     for c in iter(lambda: transcode_process.stdout.read(1), b''):
         if c == b'%':
             track_next_chars = False
-            post(f'{server_url}/queue', timeout=5, json={
+            response = post(f'{server_url}/queue', timeout=5, json={
                 'method': 'updateProgress',
                 'password': server_password,
                 'progress': float(next_progress_num),
-                'queueIndex': queueIndex
+                'uniqueID': item["uniqueID"]
             })
+            response_code = loads(response.text)["status"]
+
+            # if video has been removed from queue, stop decoding
+            if response_code == 410:
+                transcode_process.kill()
+                remove(f'{file_location}_{item["width"]}_{item["height"]}.vtdi')
+                return
+
             next_progress_num = ""
             progress_sent = True
+
         if track_next_chars:
             next_progress_num += c.decode()
+
         if c == b'\r':
             track_next_chars = True
 
@@ -65,12 +76,13 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
             'method': 'updateProgress',
             'password': server_password,
             'progress': 100,
-            'queueIndex': queueIndex
+            'uniqueID': item["uniqueID"]
         })
 
 
 def main():
-    env_json = open('env.json', encoding='utf-8')
+    dir_path =  path.dirname(path.realpath(__file__))
+    env_json = open(f'{dir_path}/env.json', encoding='utf-8')
     env_vars = load(env_json)
 
     queue = loads(get(f'{env_vars["URL"]}/queue', timeout=5).text)['videos']

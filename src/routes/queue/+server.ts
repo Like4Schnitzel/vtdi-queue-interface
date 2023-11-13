@@ -6,6 +6,8 @@ import { somethingEmitter } from "$lib/server/createSSE";
 import type { QueueInfo, YouTubeResponse } from "$lib/types";
 import { fixedCooldown } from "$lib/consts";
 
+let prevQueueIndex: number | null = 0;
+
 export const GET: RequestHandler = async () => {
     return json(queue);
 };
@@ -71,9 +73,26 @@ export const POST: RequestHandler = async ({ request }) => {
 
     } else if (body.method === "updateProgress") {
         if (sha256(body.password) === "8943da420286691033797a98fb0d57fd7596b56f419a2102d881777ba53b25ca") {
-            queue.videos[body.queueIndex].transcodeProgress = body.progress;
+            // check if we can reuse prevQueueIndex
+            if (!prevQueueIndex || !queue.videos[prevQueueIndex] || queue.videos[prevQueueIndex].uniqueID !== body.uniqueID) {
+                prevQueueIndex = null;
+                // if not, set it to the new index
+                for (let i = 0; i < queue.videos.length; i++) {
+                    if (queue.videos[i].uniqueID === body.uniqueID) {
+                        prevQueueIndex = i;
+                        break;
+                    }
+                }
+
+                // if the video has been removed from the queue entirely, send back a 410 GONE
+                if (prevQueueIndex === null) {
+                    return json({ status: 410 });
+                }
+            }
+
+            queue.videos[prevQueueIndex].transcodeProgress = body.progress;
             somethingEmitter.emit('progressUpdated', {
-                index: body.queueIndex,
+                index: prevQueueIndex,
                 newProgress: body.progress
             });
             if (body.queueIndex === 0 && body.progress === 100) {
