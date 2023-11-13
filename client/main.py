@@ -16,7 +16,7 @@ def string_to_valid_filename(s):
     # taken from https://stackoverflow.com/a/295152
     return "".join([x if x.isalnum() else "_" for x in s])
 
-def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password: str, queueIndex: int):
+def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password: str):
     video_id = item["url"][item["url"].rfind('=')+1:]
     file_location = f'{src_dir}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}'
     # download video
@@ -90,8 +90,7 @@ def main():
         Thread(target=handle_queue_item, args=[
             video, env_vars["VTDI_SRC_DIR"],
             env_vars["URL"],
-            env_vars["POST_PASSWORD"],
-            len(queue)-1]).start()
+            env_vars["POST_PASSWORD"]]).start()
 
     messages = SSEClient(f'{env_vars["URL"]}/api/sse')
 
@@ -99,7 +98,11 @@ def main():
         if msg.event == 'queueItemAdded':
             queue_item = loads(msg.data)
             queue.append(queue_item)
-            handle_queue_item(queue_item, env_vars["VTDI_SRC_DIR"], env_vars["URL"], env_vars["POST_PASSWORD"], len(queue)-1)
+            Thread(target=handle_queue_item, args=[
+                queue_item,
+                env_vars["VTDI_SRC_DIR"],
+                env_vars["URL"],
+                env_vars["POST_PASSWORD"]]).start()
 
         elif msg.event == 'queueItemRemoved':
             queue_index = loads(msg.data)
