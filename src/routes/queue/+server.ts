@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
                 index: prevQueueIndex,
                 newProgress: body.progress
             });
-            if (body.queueIndex === 0 && body.progress === 100) {
+            if (prevQueueIndex === 0 && body.progress === 100) {
                 queue.videos[0].timeStartedPlaying = Date.now();
                 somethingEmitter.emit('playVideo');
             }
@@ -116,12 +116,12 @@ export const DELETE: RequestHandler = async ({ request }) => {
         const indexToRemove = body.index;
         availableIDs.push(queue.videos[indexToRemove].uniqueID);
         queue.videos.splice(indexToRemove, 1);
+        somethingEmitter.emit('queueItemRemoved', indexToRemove);
         // gotta set the new first video of the queue to just having started playing
         if (indexToRemove === 0 && queue.videos[0] && queue.videos[0].transcodeProgress === 100) {
             queue.videos[0].timeStartedPlaying = Date.now();
             somethingEmitter.emit('playVideo');
         }
-        somethingEmitter.emit('queueItemRemoved', indexToRemove);
         return json({ status: 200 });
     }
 

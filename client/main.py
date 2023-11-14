@@ -9,6 +9,7 @@ from json import load
 from json import loads
 from requests import get
 from requests import post
+from requests import delete
 from sseclient import SSEClient
 from yt_dlp import YoutubeDL
 
@@ -79,6 +80,22 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
             'uniqueID': item["uniqueID"]
         })
 
+def play_video(src_dir: str, server_url: str, password: str, video: dict):
+    video_id = video["url"][video["url"].rfind('=')+1:]
+    file_location = f'{src_dir}/data/queue/{string_to_valid_filename(video["info"]["title"])}_{video_id}'
+    decode_process = Popen([
+        'konsole',
+        '--fullscreen',
+        '-e',
+        f'{src_dir}/build/Decoder {file_location}_{video["width"]}_{video["height"]}.vtdi'
+    ])
+    decode_process.wait()
+
+    # remove video from queue after it's done playing
+    delete(f'{server_url}/queue', timeout=5, json={
+        'password': password,
+        'index': 0
+    })
 
 def main():
     dir_path =  path.dirname(path.realpath(__file__))
@@ -102,7 +119,8 @@ def main():
                 queue_item,
                 env_vars["VTDI_SRC_DIR"],
                 env_vars["URL"],
-                env_vars["POST_PASSWORD"]]).start()
+                env_vars["POST_PASSWORD"]
+            ]).start()
 
         elif msg.event == 'queueItemRemoved':
             queue_index = loads(msg.data)
@@ -111,6 +129,15 @@ def main():
             #file_location = f'{env_vars["VTDI_SRC_DIR"]}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}.mp4'
             #remove(file_location)
             queue.pop(queue_index)
+        
+        elif msg.event == 'playVideo':
+            print("received play signal")
+            Thread(target=play_video, args=[
+                env_vars["VTDI_SRC_DIR"],
+                env_vars["URL"],
+                env_vars["POST_PASSWORD"],
+                queue[0]
+            ]).start()
 
 if __name__ == '__main__':
     main()
