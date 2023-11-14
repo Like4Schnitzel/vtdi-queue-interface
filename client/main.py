@@ -3,6 +3,7 @@ from os import path
 from subprocess import Popen
 from subprocess import PIPE
 from threading import Thread
+from time import sleep
 from sys import stdout
 from pprint import pprint
 from json import load
@@ -12,6 +13,7 @@ from requests import post
 from requests import delete
 from sseclient import SSEClient
 from yt_dlp import YoutubeDL
+from pythonping import ping
 
 def string_to_valid_filename(s):
     # taken from https://stackoverflow.com/a/295152
@@ -102,6 +104,9 @@ def main():
     env_json = open(f'{dir_path}/env.json', encoding='utf-8')
     env_vars = load(env_json)
 
+    # average server latency in miliseconds
+    server_latency = ping(target=env_vars["URL"], count=10, timeout=5).rtt_avg_ms
+
     queue = loads(get(f'{env_vars["URL"]}/queue', timeout=5).text)['videos']
     for video in queue:
         Thread(target=handle_queue_item, args=[
@@ -129,9 +134,9 @@ def main():
             #file_location = f'{env_vars["VTDI_SRC_DIR"]}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}.mp4'
             #remove(file_location)
             queue.pop(queue_index)
-        
+
         elif msg.event == 'playVideo':
-            print("received play signal")
+            sleep(server_latency / 1000)
             Thread(target=play_video, args=[
                 env_vars["VTDI_SRC_DIR"],
                 env_vars["URL"],
