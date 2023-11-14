@@ -12,8 +12,8 @@ from requests import get
 from requests import post
 from requests import delete
 from sseclient import SSEClient
+from time import time
 from yt_dlp import YoutubeDL
-from pythonping import ping
 
 def string_to_valid_filename(s):
     # taken from https://stackoverflow.com/a/295152
@@ -104,10 +104,10 @@ def main():
     env_json = open(f'{dir_path}/env.json', encoding='utf-8')
     env_vars = load(env_json)
 
-    # average server latency in miliseconds
-    server_latency = ping(target=env_vars["URL"], count=10, timeout=5).rtt_avg_ms
-
+    start_time = time()
     queue = loads(get(f'{env_vars["URL"]}/queue', timeout=5).text)['videos']
+    end_time = time()
+    one_way_latency_seconds = (end_time - start_time) / 2
     for video in queue:
         Thread(target=handle_queue_item, args=[
             video, env_vars["VTDI_SRC_DIR"],
@@ -136,7 +136,7 @@ def main():
             queue.pop(queue_index)
 
         elif msg.event == 'playVideo':
-            sleep(server_latency / 1000)
+            sleep(one_way_latency_seconds)
             Thread(target=play_video, args=[
                 env_vars["VTDI_SRC_DIR"],
                 env_vars["URL"],
