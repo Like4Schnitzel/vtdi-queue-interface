@@ -30,6 +30,8 @@
             playerElem = stringToHTMLElement(currentlyPlaying.info.html);
             const timeElapsedSinceAdded = (Date.now() - $localQueue.videos[0].timeStartedPlaying) / 1000;
             playerElem.src += `&start=${Math.round(timeElapsedSinceAdded)}&autoplay=1`;
+            playerElem.width = "";
+            playerElem.height = "";
             if (playerContainer.firstChild) {
                 playerContainer.removeChild(playerContainer.firstChild);
             }
@@ -47,5 +49,20 @@
 <style>
     .playerDiv {
         pointer-events: none;
+        position: relative;
+        display: block;
+        width: 90%;
+        height: 0;
+        margin: auto;
+        padding: 0% 0% 56.25%;  /* 16:9 ratio */
+        overflow: hidden;
+    }
+
+    :global(.playerDiv iframe) {
+        position: absolute;
+        top: 0; bottom: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
     }
 </style>
