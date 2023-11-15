@@ -12,6 +12,7 @@ from requests import get
 from requests import post
 from requests import delete
 from sseclient import SSEClient
+from playsound import playsound
 from time import time
 from yt_dlp import YoutubeDL
 
@@ -24,8 +25,8 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
     file_location = f'{src_dir}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}'
     # download video
     ydl_ops = {
-        'format': 'mp4',
-        'outtmpl': {'default': f'{file_location}.mp4'}
+        'format': 'bv[height<=?240]+ba',
+        'outtmpl': {'default': f'{file_location}.webm'}
     }
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([item["url"]])
@@ -34,7 +35,7 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
     transcode_process = Popen([
         f'{src_dir}/build/Transcoder',
         '--path',
-        f'{file_location}.mp4',
+        f'{file_location}.webm',
         '--vtdi-path',
         f'{file_location}_{item["width"]}_{item["height"]}.vtdi',
         '--width',
@@ -85,12 +86,14 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
 def play_video(src_dir: str, server_url: str, password: str, video: dict):
     video_id = video["url"][video["url"].rfind('=')+1:]
     file_location = f'{src_dir}/data/queue/{string_to_valid_filename(video["info"]["title"])}_{video_id}'
+
     decode_process = Popen([
         'konsole',
         '--fullscreen',
         '-e',
         f'{src_dir}/build/Decoder {file_location}_{video["width"]}_{video["height"]}.vtdi'
     ])
+    playsound(f'{file_location}.webm', False)
     decode_process.wait()
 
     # remove video from queue after it's done playing
@@ -112,7 +115,8 @@ def main():
         Thread(target=handle_queue_item, args=[
             video, env_vars["VTDI_SRC_DIR"],
             env_vars["URL"],
-            env_vars["POST_PASSWORD"]]).start()
+            env_vars["POST_PASSWORD"]
+        ]).start()
 
     messages = SSEClient(f'{env_vars["URL"]}/api/sse')
 
