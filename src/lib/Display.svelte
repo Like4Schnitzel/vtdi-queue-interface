@@ -15,7 +15,7 @@
     };
 
     onMount(() => {
-        source = new EventSource('/api/sse', {
+        source = new EventSource('./api/sse', {
             withCredentials: false
         });
         source.addEventListener('playVideo', () => {

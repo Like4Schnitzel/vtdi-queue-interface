@@ -6,9 +6,9 @@
     let source: EventSource;
 
     onMount(async () => {
-        localQueue.set(await (await fetch('/queue')).json());
+        localQueue.set(await (await fetch('./queue')).json());
 
-        source = new EventSource('/api/sse', {
+        source = new EventSource('./api/sse', {
             withCredentials: false
         });
         source.addEventListener('queueModified', async (e) => {
@@ -23,7 +23,7 @@
     });
 
     const deleteFromQueue = async (i: number) => {
-        await fetch ('/queue', {
+        await fetch ('./queue', {
             method: 'DELETE',
             body: JSON.stringify({
                 password: pw,
