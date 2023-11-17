@@ -1,6 +1,6 @@
 import type { Queue } from "./types";
 
-export const fixedCooldown = 5000;
+export const fixedCooldown = 30 * 1000;
 
 export const maxQueueSize = 5;
 
