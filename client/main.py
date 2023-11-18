@@ -16,28 +16,25 @@ from playsound import playsound
 from time import time
 from yt_dlp import YoutubeDL
 
-def string_to_valid_filename(s):
-    # taken from https://stackoverflow.com/a/295152
-    return "".join([x if x.isalnum() else "_" for x in s])
-
 def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password: str):
-    video_id = item["url"][item["url"].rfind('=')+1:]
-    file_location = f'{src_dir}/data/queue/{string_to_valid_filename(item["info"]["title"])}_{video_id}'
     # download video
     ydl_ops = {
         'format': 'bv[height<=?240]+ba',
-        'outtmpl': {'default': f'{file_location}.webm'}
+        'outtmpl': f'{src_dir}/data/queue/%(title)s_%(id)s.%(ext)s'
     }
     with YoutubeDL(ydl_ops) as ydl:
+        info = ydl.extract_info(item["url"])
+        item["fileName"] = f'{src_dir}/data/queue/{info["title"]}_{info["id"]}.{info["ext"]}'
+        item["vtdiFileName"] = f'{src_dir}/data/queue/{info["title"]}_{info["id"]}_{item["width"]}_{item["height"]}.vtdi'
         ydl.download([item["url"]])
 
     # transcode video
     transcode_process = Popen([
         f'{src_dir}/build/Transcoder',
         '--path',
-        f'{file_location}.webm',
+        item["fileName"],
         '--vtdi-path',
-        f'{file_location}_{item["width"]}_{item["height"]}.vtdi',
+        item["vtdiFileName"],
         '--width',
         str(item["width"]),
         '--height',
@@ -62,7 +59,7 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
             # if video has been removed from queue, stop decoding
             if response_code == 410:
                 transcode_process.kill()
-                remove(f'{file_location}_{item["width"]}_{item["height"]}.vtdi')
+                remove(item["vtdiFileName"])
                 return
 
             next_progress_num = ""
@@ -84,16 +81,14 @@ def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password
         })
 
 def play_video(src_dir: str, server_url: str, password: str, video: dict):
-    video_id = video["url"][video["url"].rfind('=')+1:]
-    file_location = f'{src_dir}/data/queue/{string_to_valid_filename(video["info"]["title"])}_{video_id}'
-
+    console_safe_filename = video["vtdiFileName"].replace(" ", "\\ ")
     decode_process = Popen([
         'konsole',
         '--fullscreen',
         '-e',
-        f'{src_dir}/build/Decoder {file_location}_{video["width"]}_{video["height"]}.vtdi'
+        f'{src_dir}/build/Decoder {console_safe_filename}'
     ])
-    playsound(f'{file_location}.webm', False)
+    playsound(video["fileName"], False)
     decode_process.wait()
 
     # remove video from queue after it's done playing
