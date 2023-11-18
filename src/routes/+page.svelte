@@ -8,7 +8,8 @@
 
     let source: EventSource;
     onMount(async () => {
-        localQueue.set(await (await fetch('./queue')).json())
+        localQueue.set(await (await fetch('./queue')).json());
+        cooldown.update($localQueue.cooldownStartTime);
 
         source = new EventSource('./api/sse', {
             withCredentials: false

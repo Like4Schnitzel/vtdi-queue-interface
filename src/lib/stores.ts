@@ -22,7 +22,7 @@ function createQueue() {
 }
 
 function createCooldown() {
-    const { subscribe, set, update } = writable<number>(fixedCooldown);
+    const { subscribe, set, update } = writable<number>(Math.round(fixedCooldown/1000));
 
     return {
         subscribe,
