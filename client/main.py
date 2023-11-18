@@ -19,7 +19,7 @@ from yt_dlp import YoutubeDL
 def handle_queue_item(item: dict, src_dir: str, server_url: str, server_password: str):
     # download video
     ydl_ops = {
-        'format': 'bv[height<=?240]+ba',
+        'format': 'bv+ba',
         'outtmpl': f'{src_dir}/data/queue/%(title)s_%(id)s.%(ext)s'
     }
     with YoutubeDL(ydl_ops) as ydl:
