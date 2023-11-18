@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import type { Queue, QueueInfo } from "./types";
+import { fixedCooldown } from "./consts";
 
 function createQueue() {
     const { subscribe, set, update } = writable<Queue>({cooldownStartTime: Date.now(), videos: []});
@@ -21,7 +22,7 @@ function createQueue() {
 }
 
 function createCooldown() {
-    const { subscribe, set, update } = writable<number>(0);
+    const { subscribe, set, update } = writable<number>(fixedCooldown);
 
     return {
         subscribe,
