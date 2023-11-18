@@ -66,7 +66,7 @@
 
 <div class="biggerContainer">
     <div class="container">
-        <input bind:value={inputText} on:keydown={async (e) => {
+        <input class="urlInput" bind:value={inputText} on:keydown={async (e) => {
             if (e.key === 'Enter') {
                 processInput();
             }
@@ -98,7 +98,7 @@
 
 <style>
     .biggerContainer {
-        width: fit-content;
+        width: 100%;
     }
     
     .container {
@@ -106,10 +106,14 @@
         gap: 1rem;
         align-items: center;
     }
+
+    .urlInput {
+        width: 50%;
+    }
     
     .dimensionsInputs {
         display: flex;
-        width: 20%;
+        width: 100%;
     }
 
     .dimensionsInputs input {
