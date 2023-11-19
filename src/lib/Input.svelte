@@ -27,12 +27,10 @@
         inputURL = new URL(`https://www.youtube.com/watch?v=${id}`);
 
         if (inputURL) {
-            const requestURL = new URL(`https://www.youtube.com/oembed?url=${inputURL}&format=json`);
             const response = await fetch('./queue', {
                 method: 'POST',
                 body: JSON.stringify({
                     method: 'queueItem',
-                    url: requestURL,
                     baseURL: inputURL,
                     width: inputWidth,
                     height: inputHeight

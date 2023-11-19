@@ -34,9 +34,10 @@ export const POST: RequestHandler = async ({ request }) => {
             return json({ status: 400, message: "Height too big" });
         }
 
+        const requestURL = new URL(`https://www.youtube.com/oembed?url=${body.baseURL}&format=json`);
         let res;
         try {
-            res = await fetch(body.url);
+            res = await fetch(requestURL);
         } catch {
             return json({ status: 502, message: "Request blocked" })
         }
